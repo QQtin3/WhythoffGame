@@ -1,5 +1,5 @@
 /**
- * Représentation du jeu de Whythoff jouable dans un terminal en version joueur contre joueur
+ * Représentation du jeu de Whythoff jouable dans un terminal en version joueur contre ordinateur
  *
  * @author LEGEAY Quentin
  * @version 1.0
@@ -13,19 +13,6 @@ class Main2 {
                 seul de ces trois mouvements : déplacement d’un nombre quelconque de cases vers la gauche, le
                 bas, ou le long d’une diagonale vers la gauche et le bas. Le joueur gagnant est celui qui parvient a
                 mettre le pion sur la case inférieure gauche.\n""");
-
-        System.out.println("""
-                Vous avez décidé de jouer au mode contre ordinateur.
-                Il existe 3 niveaux différents d'ordinateur :
-                1. Facile (joue aléatoirement)
-                2. Intermédiaire (cherche les solutions en fin de partie)
-                3. Expert (choisi toujours les positions gagnantes)\n""");
-
-        // Choisir la difficulté de l'ordinateur
-        int botDifficulty;
-        do {
-            botDifficulty = SimpleInput.getInt("Veuillez saisir la difficulté de l'ordinateur");
-        } while (botDifficulty < 1 || botDifficulty > 3);
 
         // Choisir le pseudonyme du joueur
         String player = SimpleInput.getString("Nom du joueur : ");
@@ -45,13 +32,12 @@ class Main2 {
     /**
      * Déroule une partie en Joueur contre Ordinateur (ou Player versus Bot (PvB)) du jeu
      *
-     * @param board  Matricce de jeu
+     * @param board  Matrice de jeu
      * @param player Nom du joueur
      */
     void gamePvB(int[][] board, String player, int botDifficulty) {
 
-        // Le premier joueur est choisi "aléatoirement"
-        int playerTurn = (int) (Math.random() * 2);
+        
 
         int nbTour = 1;
         boolean winCondition = false;
@@ -106,7 +92,7 @@ class Main2 {
                 playerMove(board, nbCase, playerDecision);
             }
             else {
-                botMove(board, botDifficulty);
+                botMove(board);
             }
 
 
@@ -171,15 +157,7 @@ class Main2 {
         int x = pos[1];
         int[] newPos = {y, x};
 
-        if (botDifficulty == 1) {
-
-        } else if (botDifficulty == 2) {
-
-
-        } else {
-
-
-        }
+        
         switchTwoCase(tab, pos, newPos);
     }
 

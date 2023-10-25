@@ -276,4 +276,26 @@ class Main {
 
     // ######### TEST METHODS PART #########
 
+	void globalTest() {
+		
+		
+		
+		
+		
+	}
+	
+	void testLegalMove() {}
+	
+	boolean testGameIsDone(int[][] tab) {
+		
+	}
+	
+	void testGetPawnPositition() {
+		
+	}
+	
+	void testCreateBoarf() {
+		
+		
+	}
 }
