@@ -36,9 +36,6 @@ class Main2 {
      * @param player Nom du joueur
      */
     void gamePvB(int[][] board, String player, int botDifficulty) {
-
-        
-
         int nbTour = 1;
         boolean winCondition = false;
 
@@ -121,9 +118,13 @@ class Main2 {
     int[][] createBoard(int size) {
         int[][] tab = new int[size][size];
 
+		int pawnX;
+		int pawnY;
+		do {
         // Le +2 évite les cas de parties trop évidentes où le pion est sur les deux premières lignes et colonnes
-        int pawnX = 2 + (int) (Math.random() * (size - 2));
-        int pawnY = 2 + (int) (Math.random() * (size - 2));
+			pawnX = 2 + (int) (Math.random() * (size - 2));
+			pawnY = 2 + (int) (Math.random() * (size - 2));
+		} while (pawnX == pawnY);
         tab[pawnY][pawnX] = 1;  // Place le pion
         return tab;
     }
