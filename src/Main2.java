@@ -4,7 +4,7 @@
  * @author LEGEAY Quentin
  * @version 1.0
  */
-class Main {
+class Main2 {
     void principal() {
         System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
@@ -14,8 +14,21 @@ class Main {
                 bas, ou le long d’une diagonale vers la gauche et le bas. Le joueur gagnant est celui qui parvient a
                 mettre le pion sur la case inférieure gauche.\n""");
 
-        String player1 = SimpleInput.getString("Nom du joueur1 : ");
-        String player2 = SimpleInput.getString("Nom du joueur2 : ");
+        System.out.println("""
+                Vous avez décidé de jouer au mode contre ordinateur.
+                Il existe 3 niveaux différents d'ordinateur :
+                1. Facile (joue aléatoirement)
+                2. Intermédiaire (cherche les solutions en fin de partie)
+                3. Expert (choisi toujours les positions gagnantes)\n""");
+
+        // Choisir la difficulté de l'ordinateur
+        int botDifficulty;
+        do {
+            botDifficulty = SimpleInput.getInt("Veuillez saisir la difficulté de l'ordinateur");
+        } while (botDifficulty < 1 || botDifficulty > 3);
+
+        // Choisir le pseudonyme du joueur
+        String player = SimpleInput.getString("Nom du joueur : ");
 
         // Choisir la taille du plateau
         int boardSize;
@@ -26,74 +39,78 @@ class Main {
         // Créer la matrice de jeu
         int[][] board = createBoard(boardSize);
 
-        // Débute le jeu Joueur contre Joueur (JcJ ou PvP)
-        gamePvP(board, player1, player2);
+        gamePvB(board, player, botDifficulty);
     }
 
     /**
-     * Déroule une partie en Joueur contre Joueur (ou Player versus Player (PvP)) du jeu
+     * Déroule une partie en Joueur contre Ordinateur (ou Player versus Bot (PvB)) du jeu
      *
-     * @param board   Matricce de jeu
-     * @param player1 Nom du joueur1
-     * @param player2 Nom du joueur2
+     * @param board  Matricce de jeu
+     * @param player Nom du joueur
      */
-    void gamePvP(int[][] board, String player1, String player2) {
+    void gamePvB(int[][] board, String player, int botDifficulty) {
 
         // Le premier joueur est choisi "aléatoirement"
         int playerTurn = (int) (Math.random() * 2);
 
         int nbTour = 1;
-        int playerDecision;
         boolean winCondition = false;
 
         // Déroulement du jeu
         while (!winCondition) {
             System.out.print("Tour n° " + nbTour + " - ");
             if (playerTurn == 0) {
-                System.out.println("c'est à " + player1 + " de jouer");
+                System.out.println("c'est à " + player + " de jouer");
             } else {
-                System.out.println("c'est à " + player2 + " de jouer");
+                System.out.println("c'est à l'ordinateur de jouer");
             }
 
             // Affiche la position du pion sur le plateau et le plateau
             int[] pawn = getPawnPosition(board);
             displayTab(board);
 
-            // Gère les erreurs possibles du joueur lors de ses choix de déplacement.
-            boolean isLegal;
-            int nbCase;
-            do {
+            // Le cas où c'est au joueur humain de jouer
+            if (playerTurn == 0) {
 
-                // Empêche le joueur de rentrer une valeur autre que 1/2/3
+                // Gère les erreurs possibles du joueur lors de ses choix de déplacement.
+                boolean isLegal;
+                int nbCase;
+                int playerDecision;
                 do {
-                    System.out.println("""
-                            Vous disposez de 3 coups :
-                             1. Déplacement vers la gauche
-                             2. Déplacement vers le bas
-                             3. Déplacement en diagonal (gauche-bas)""");
-                    playerDecision = SimpleInput.getInt("Que décidez vous de jouer ? ");
-                } while (playerDecision < 1 || playerDecision > 3);
+
+                    // Empêche le joueur de rentrer une valeur autre que 1/2/3
+                    do {
+                        System.out.println("""
+                                Vous disposez de 3 coups :
+                                 1. Déplacement vers la gauche
+                                 2. Déplacement vers le bas
+                                 3. Déplacement en diagonal (gauche-bas)""");
+                        playerDecision = SimpleInput.getInt("Que décidez vous de jouer ? ");
+                    } while (playerDecision < 1 || playerDecision > 3);
 
 
-                // Empêche le joueur de saisir une valeur négative
-                do {
-                    nbCase = SimpleInput.getInt("Veuillez saisir un nombre de case de déplacement ");
-                    isLegal = legalMove(pawn, playerDecision, nbCase);
-                } while (nbCase <= 0);
+                    // Empêche le joueur de saisir une valeur négative
+                    do {
+                        nbCase = SimpleInput.getInt("Veuillez saisir un nombre de case de déplacement ");
+                        isLegal = legalMove(pawn, playerDecision, nbCase);
+                    } while (nbCase <= 0);
 
 
-                if (!isLegal) {
-                    System.out.println("""
-                            ##################################
-                            Veuillez rentrer une valeur valide
-                            ##################################""");
-                }
-            } while (!isLegal);
+                    if (!isLegal) {
+                        System.out.println("""
+                                ##################################
+                                Veuillez rentrer une valeur valide
+                                ##################################""");
+                    }
+                } while (!isLegal);
+                playerMove(board, nbCase, playerDecision);
+            }
+            else {
+                botMove(board, botDifficulty);
+            }
 
-            playerMove(board, nbCase, playerDecision);
-            System.out.println();
 
-            // Regarde si la partie est terminée
+            // Détermine si la partie est finie
             winCondition = gameIsDone(board);
 
             // Si la partie n'est pas finie
@@ -104,7 +121,7 @@ class Main {
                 playerTurn = (playerTurn + 3) % 2;
             }
         }
-        displayResult(playerTurn, player1, player2, nbTour);
+        displayResult(playerTurn, player, nbTour);
     }
 
 
@@ -147,6 +164,25 @@ class Main {
         }
         switchTwoCase(tab, pos, newPos);
     }
+
+    void botMove(int[][] tab, int botDifficulty) {
+        int[] pos = getPawnPosition(tab);
+        int y = pos[0];
+        int x = pos[1];
+        int[] newPos = {y, x};
+
+        if (botDifficulty == 1) {
+
+        } else if (botDifficulty == 2) {
+
+
+        } else {
+
+
+        }
+        switchTwoCase(tab, pos, newPos);
+    }
+
 
     /**
      * Permet de retourner un tableau contenant la position du pion dans un repaire x,y
@@ -256,16 +292,15 @@ class Main {
     /**
      * @param playerTurn Qui joue le coup gagnant
      * @param nbTour     Nombre de tours
-     * @param player1    Nom du joueur 1
-     * @param player2    Nom du joueur 2
+     * @param player    Nom du joueur
      */
-    void displayResult(int playerTurn, String player1, String player2, int nbTour) {
+    void displayResult(int playerTurn, String player, int nbTour) {
         System.out.println("##### RESUME DE LA PARTIE #####");
         System.out.print("Le gagnant est : ");
         if (playerTurn == 0) {
-            System.out.println(player1);
+            System.out.println(player);
         } else if (playerTurn == 1) {
-            System.out.println(player2);
+            System.out.println("Ordinateur");
         } else {
             System.out.println("ERREUR: Impossible d'obtenir de résultat, playerTurn est incorrect !");
         }
