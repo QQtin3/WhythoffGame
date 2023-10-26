@@ -6,6 +6,8 @@
  */
 class Main {
     void principal() {
+        globalTest();
+
         System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
         System.out.println("""
@@ -28,6 +30,7 @@ class Main {
 
         // Débute le jeu Joueur contre Joueur (JcJ ou PvP)
         gamePvP(board, player1, player2);
+
     }
 
     /**
@@ -277,23 +280,92 @@ class Main {
     // ######### TEST METHODS PART #########
 
     void globalTest() {
+        System.out.println("### Test methods ###");
+
+        int[][] matrice = {{0, 1, 0}, {0, 0, 0}, {0, 0, 0}};
+        testGameIsDone(matrice, false);
 
 
+        System.out.println("\n\n");
     }
 
-    void testLegalMove() {
+    String displayMatriceTest(int[][] matrice) {
+        String display = " {";
+        for (int i = 0; i < matrice.length; i++) {
+            display += "{";
+            for (int j = 0; j < matrice[i].length; j++) {
+                display += matrice[i][j];
+                if (j != matrice[i].length - 1) {
+                    display += ", ";
+                }
+            }
+            display += "}";
+            if (i != matrice.length - 1) {
+                display += ", ";
+            }
+        }
+        display += "} ";
+        return display;
     }
 
-    boolean testGameIsDone(int[][] tab) {
-
+    /**
+     * Retourne en String un tableau donné en entrée.
+     *
+     * @param tab: tableau d'entiers
+     * @return String de l'affichage du tableau
+     */
+    String displayTabTest(int[] tab) {
+        int i = 0;
+        String display = "{";
+        while (i < tab.length - 1) {
+            display += (tab[i] + ",");
+            i = i + 1;
+        }
+        if (tab.length != 0) {
+            display += (tab[i] + "}");
+        } else {
+            display += "}";
+        }
+        return display;
     }
 
-    void testGetPawnPositition() {
-
+    void testLegalMove(int[] pawnPosition, int playerDecision, int nbCase, boolean result) {
+        System.out.println("legalMove(" + displayTabTest(pawnPosition) + ", " + playerDecision + ", " + nbCase + ") : ");
+        boolean testResult = legalMove(pawnPosition, playerDecision, nbCase);
+        if (result == testResult) {
+            System.out.print("OK");
+        } else {
+            System.out.print("ERREUR");
+        }
     }
 
-    void testCreateBoarf() {
+    void testGameIsDone(int[][] tab, boolean result) {
+        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
+        boolean testResult = gameIsDone(tab);
+        if (result == testResult) {
+            System.out.print("OK");
+        } else {
+            System.out.print("ERREUR");
+        }
+    }
 
+    void testGetPawnPositition(int[][] tab, boolean result) {
+        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
+        boolean testResult = gameIsDone(tab);
+        if (result == testResult) {
+            System.out.print("OK");
+        } else {
+            System.out.print("ERREUR");
+        }
+    }
 
+    void testCreateBoard(int[][] tab, boolean result) {
+        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
+        boolean testResult = gameIsDone(tab);
+        if (result == testResult) {
+            System.out.print("OK");
+        } else {
+            System.out.print("ERREUR");
+        }
     }
 }
