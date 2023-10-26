@@ -39,6 +39,19 @@ class Main2 {
         int nbTour = 1;
         boolean winCondition = false;
 
+        String reponseStart;
+        do {
+            // /!\ Ne gère pas le case sensitive
+            reponseStart = SimpleInput.getString("Voulez vous jouer le premier coup ? (Oui/Non)");
+        } while (reponseStart != "Oui" && reponseStart != "Non");
+
+        int playerTurn;
+        if (reponseStart == "Oui") {
+            playerTurn = 0;
+        } else {
+            playerTurn = 1;
+        }
+
         // Déroulement du jeu
         while (!winCondition) {
             System.out.print("Tour n° " + nbTour + " - ");
@@ -87,8 +100,7 @@ class Main2 {
                     }
                 } while (!isLegal);
                 playerMove(board, nbCase, playerDecision);
-            }
-            else {
+            } else {
                 botMove(board);
             }
 
@@ -118,13 +130,13 @@ class Main2 {
     int[][] createBoard(int size) {
         int[][] tab = new int[size][size];
 
-		int pawnX;
-		int pawnY;
-		do {
-        // Le +2 évite les cas de parties trop évidentes où le pion est sur les deux premières lignes et colonnes
-			pawnX = 2 + (int) (Math.random() * (size - 2));
-			pawnY = 2 + (int) (Math.random() * (size - 2));
-		} while (pawnX == pawnY);
+        int pawnX;
+        int pawnY;
+        do {
+            // Le +2 évite les cas de parties trop évidentes où le pion est sur les deux premières lignes et colonnes
+            pawnX = 2 + (int) (Math.random() * (size - 2));
+            pawnY = 2 + (int) (Math.random() * (size - 2));
+        } while (pawnX == pawnY);
         tab[pawnY][pawnX] = 1;  // Place le pion
         return tab;
     }
@@ -152,13 +164,13 @@ class Main2 {
         switchTwoCase(tab, pos, newPos);
     }
 
-    void botMove(int[][] tab, int botDifficulty) {
+    void botMove(int[][] tab) {
         int[] pos = getPawnPosition(tab);
         int y = pos[0];
         int x = pos[1];
         int[] newPos = {y, x};
 
-        
+
         switchTwoCase(tab, pos, newPos);
     }
 
@@ -271,11 +283,12 @@ class Main2 {
     /**
      * @param playerTurn Qui joue le coup gagnant
      * @param nbTour     Nombre de tours
-     * @param player    Nom du joueur
+     * @param player     Nom du joueur
      */
     void displayResult(int playerTurn, String player, int nbTour) {
         System.out.println("##### RESUME DE LA PARTIE #####");
         System.out.print("Le gagnant est : ");
+
         if (playerTurn == 0) {
             System.out.println(player);
         } else if (playerTurn == 1) {
