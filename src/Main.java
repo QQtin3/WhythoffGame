@@ -6,7 +6,8 @@
  */
 class Main {
     void principal() {
-        globalTest();
+        // Dé commenter ligne de dessous pour l'exécution des tests.
+        //globalTest();
 
         System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
@@ -22,15 +23,14 @@ class Main {
         // Choisir la taille du plateau
         int boardSize;
         do {
-            boardSize = SimpleInput.getInt("Veuillez saisir la taille du plateau de jeu (min. 3, max.99) ");
-        } while (boardSize < 3 || boardSize > 99);
+            boardSize = SimpleInput.getInt("Veuillez saisir la taille du plateau de jeu (min. 3, max. 100) ");
+        } while (boardSize < 3 || boardSize > 100);
 
         // Créer la matrice de jeu
         int[][] board = createBoard(boardSize);
 
         // Débute le jeu Joueur contre Joueur (JcJ ou PvP)
         gamePvP(board, player1, player2);
-
     }
 
     /**
@@ -109,7 +109,6 @@ class Main {
         }
         displayResult(playerTurn, player1, player2, nbTour);
     }
-
 
     /**
      * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x,y qui associe matrice[y][x] = 1
@@ -197,7 +196,12 @@ class Main {
     void displayTab(int[][] tab) {
         for (int i = tab.length - 1; i >= 0; i--) {
             // Affiche la ligne de gauche
-            System.out.print(i + " ");
+            if (tab.length > 10 && i < 10) {
+                System.out.print("0" + i + " ");
+            } else {
+                System.out.print(i + " ");
+            }
+
             for (int j = 0; j < tab[0].length; j++) {
                 System.out.print("|");
                 if (tab[i][j] == 0) {
@@ -209,10 +213,23 @@ class Main {
             System.out.println("|");
         }
 
-        // Ajoute la ligne tout en bas
-        System.out.print(" ");
+        // Ajoute la ligne tout en bas et lisse l'affichage quand + d'un chiffe
+        if (tab.length > 10) {
+            System.out.print("  ");
+        } else {
+            System.out.print(" ");
+        }
         for (int k = 0; k < tab.length; k++) {
-            System.out.print("   " + k);
+            if (tab.length > 10) {
+                if (k < 10){
+                    System.out.print("  0" + k);
+                } else {
+                    System.out.print("  " + k);
+                }
+            }
+            else {
+                System.out.print("   " + k);
+            }
         }
         System.out.println();
     }
@@ -226,7 +243,6 @@ class Main {
     boolean gameIsDone(int[][] tab) {
         return tab[0][0] == 1;
     }
-
 
     /**
      * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau..)
@@ -278,15 +294,20 @@ class Main {
 
 
     /* ######### TEST METHODS PART #########
-    *  Cette partie permet le test de toutes les autres méthodes utilisées dans le programme.
-    *  Elle utilise deux autres méthodes qui permettent d'afficher correctement
-    *  les matrices et tableaux (displayMatriceTest et displayTabTest)
-    *
-    *  Tous les tests de méthodes sont regroupés dans globalTest() ce qui permet un rendu plus
-    *  efficace dans principal() en cas de doute sur l'efficacité des méthodes (évite les appels 1 à 1)
-    *  #####################################
-    * */
+     *  Cette partie permet le test de toutes les autres méthodes utilisées dans le programme.
+     *  Elle utilise deux autres méthodes qui permettent d'afficher correctement
+     *  les matrices et tableaux (displayMatriceTest et displayTabTest)
+     *
+     *  Tous les tests de méthodes sont regroupés dans globalTest() ce qui permet un rendu plus
+     *  efficace dans principal() en cas de doute sur l'efficacité des méthodes (évite les appels 1 à 1)
+     *  #####################################
+     * */
 
+
+    /**
+     * Méthode de test qui affiche toutes les autres méthodes de test afin de s'assurer du bon fonctionnement
+     * de toutes les autres méthodes du programme.
+     */
     void globalTest() {
         System.out.println("### Test methods ###");
 
@@ -296,17 +317,17 @@ class Main {
                 {0, 0, 0}};
         int[] pawnPosition = {0, 1};
         testGameIsDone(matrice, false);
-        testGetPawnPositition(matrice, pawnPosition);
+        testGetPawnPosition(matrice, pawnPosition);
         testLegalMove(pawnPosition, 1, 1, true);
         testCreateBoard(4);
         int[][] newMatrice = {{0, 0, 0},
                 {0, 0, 0},
                 {0, 0, 1}};
-        int[] coord1 = {0,1};
-        int[] coord2 = {2,2};
+        int[] coord1 = {0, 1};
+        int[] coord2 = {2, 2};
         testSwitchTwoCase(matrice, coord1, coord2, newMatrice);
 
-        System.out.println("\n\n");
+        System.out.println("####################\n\n\n");
     }
 
     /**
@@ -335,7 +356,7 @@ class Main {
     }
 
     /**
-     * Retourne en String un tableau donné en entrée.
+     * Retourne en String un tableau donné en entrée
      *
      * @param tab: tableau d'entiers
      * @return String de l'affichage du tableau
@@ -355,7 +376,14 @@ class Main {
         return display;
     }
 
-
+    /**
+     * Méthode de test de legalMove() qui renvoie vrai si le coup est jouable par un utilisateur ou non
+     *
+     * @param pawnPosition   Coordonnés du pion sur le plateau
+     * @param playerDecision Le coup décidé par le joueur (1/2/3)
+     * @param nbCase         Le nombre de cases de déplacement du joueur
+     * @param result         Contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
     void testLegalMove(int[] pawnPosition, int playerDecision, int nbCase, boolean result) {
         System.out.println("legalMove(" + displayTabTest(pawnPosition) + ", " + playerDecision + ", " + nbCase + ") : ");
         boolean testResult = legalMove(pawnPosition, playerDecision, nbCase);
@@ -366,9 +394,15 @@ class Main {
         }
     }
 
-    void testGameIsDone(int[][] tab, boolean result) {
-        System.out.println("gameIsDone(" + displayMatriceTest(tab) + ") : ");
-        boolean testResult = gameIsDone(tab);
+    /**
+     * Méthode de test de gameIsDone() qui test si la partie est finie ou non.
+     *
+     * @param matrice Matrice de jeu avec notre pion
+     * @param result  Booléen qui contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
+    void testGameIsDone(int[][] matrice, boolean result) {
+        System.out.println("gameIsDone(" + displayMatriceTest(matrice) + ") : ");
+        boolean testResult = gameIsDone(matrice);
         if (result == testResult) {
             System.out.println("OK");
         } else {
@@ -376,9 +410,16 @@ class Main {
         }
     }
 
-    void testGetPawnPositition(int[][] tab, int[] result) {
-        System.out.println("getPawnPosition(" + displayMatriceTest(tab) + ") : ");
-        int[] testResult = getPawnPosition(tab);
+
+    /**
+     * Méthode de test de getPawnPosition() qui renvoie les coordonnées du pion sur le plateau
+     *
+     * @param matrice Matrice de jeu avec notre pion
+     * @param result  Tableau qui contient le résultat attendu de la fonction getPawnPosition pour le tableau donné
+     */
+    void testGetPawnPosition(int[][] matrice, int[] result) {
+        System.out.println("getPawnPosition(" + displayMatriceTest(matrice) + ") : ");
+        int[] testResult = getPawnPosition(matrice);
         // Vérifie que les deux tableaux à deux nombres aient bien les mêmes valeurs
         if (result[0] == testResult[0] && result[1] == testResult[1]) {
             System.out.println("OK");
@@ -387,6 +428,11 @@ class Main {
         }
     }
 
+    /**
+     * Méthode de test de createBoard() qui créé une matrice de taille size, et place un pion "aléatoirement" dedans
+     *
+     * @param size Taille du plateau qui doit être créé
+     */
     void testCreateBoard(int size) {
         System.out.println("createBoard(" + size + ") : ");
         int[][] testResult = createBoard(size);
@@ -413,22 +459,34 @@ class Main {
         }
     }
 
+    /**
+     * Méthode de test de switchTwoCase() qui échange deux cases d'une matrice
+     *
+     * @param coord1  Coordonnés de la première case à intervertir
+     * @param coord2  Coordonnés de la deuxième case à intervertir
+     * @param matrice Matrice à l'origine utilisée avant l'utilisation de la fonction
+     * @param result  Matrice qui contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
     void testSwitchTwoCase(int[][] matrice, int[] coord1, int[] coord2, int[][] result) {
-        // TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
+        /* TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
+         *  Problème réglé par la méthode clone() peut être effectué à la main cependant.*/
 
-        System.out.println("switchTwoCase(" + displayMatriceTest(matrice) + ", "
+        // Méthode non vue : copie le contenu d'un tableau/d'une matrice
+        int[][] matriceCopy = matrice.clone();
+
+        System.out.println("switchTwoCase(" + displayMatriceTest(matriceCopy) + ", "
                 + displayTabTest(coord1) + ", "
                 + displayTabTest(coord2) + ", "
                 + displayMatriceTest(result) + ") : ");
 
-        switchTwoCase(matrice, coord1, coord2);
+        switchTwoCase(matriceCopy, coord1, coord2);
 
         /* Ici on va regarder l'ensemble des cases de notre matrice modifiée et de notre résultat attendu afin d'être
          * absolument sûr que notre fonction de départ n'ait pas d'effet inattendu sur d'autres cases du tableau */
         boolean isEqual = true;
-        for (int i = 0; i < matrice.length; i++) {
-            for (int j = 0; j < matrice[i].length; j++) {
-                if (matrice[i][j] != result[i][j]) { // Si on remarque une différence entre deux cases
+        for (int i = 0; i < matriceCopy.length; i++) {
+            for (int j = 0; j < matriceCopy[i].length; j++) {
+                if (matriceCopy[i][j] != result[i][j]) { // Si on remarque une différence entre deux cases
                     isEqual = false;
                 }
             }
