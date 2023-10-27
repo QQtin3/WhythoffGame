@@ -9,16 +9,7 @@ class Main2 {
         // Dé commenter ligne de dessous pour l'exécution des tests.
         //globalTest();
 
-        int[][] test = stringToMatrice("1-2-3 5-7-9 2-4-6");
-        String teststr = displayMatriceTest(test);
-        //System.out.print(teststr);
-
-        int[][] board = createBoard(12);
-        int[][] posGagnantes = posGagnante(board);
-        String tab = displayMatriceTest(posGagnantes);
-        System.out.println(tab);
-
-        /*System.out.println("Bienvenue dans le jeu !");
+        System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
         System.out.println("""
                 Le pion est placé initialement au hasard sur le plateau. A chaque tour, un joueur a le droit a un
@@ -39,7 +30,7 @@ class Main2 {
         // Créer la matrice de jeu
         int[][] board = createBoard(boardSize);
 
-        gamePvB(board, player);*/
+        gamePvB(board, player);
     }
 
     /**
@@ -52,14 +43,14 @@ class Main2 {
         int nbTour = 1;
         boolean winCondition = false;
 
-        String reponseStart;
+        int reponseStart;
         do {
             // /!\ Ne gère pas le case sensitive
-            reponseStart = SimpleInput.getString("Voulez vous jouer le premier coup ? (Oui/Non)");
-        } while (reponseStart != "Oui" && reponseStart != "Non");
+            reponseStart = SimpleInput.getInt("Voulez vous jouer le premier coup ? (1: Oui/ 2: Non)");
+        } while (reponseStart != 1 && reponseStart != 2);
 
         int playerTurn;
-        if (reponseStart == "Oui") {
+        if (reponseStart == 1) {
             playerTurn = 0;
         } else {
             playerTurn = 1;
@@ -97,7 +88,7 @@ class Main2 {
                 playerTurn = (playerTurn + 3) % 2;
             }
         }
-        displayResult(playerTurn, player, nbTour);
+        displayResult(board, playerTurn, player, nbTour);
     }
 
 
@@ -183,25 +174,38 @@ class Main2 {
     }
 
     void botMove(int[][] board) {
-        int[] pos = getPawnPosition(board);
-        int y = pos[0];
-        int x = pos[1];
+        int[] pawnPosition = getPawnPosition(board);
+        int y = pawnPosition[0];
+        int x = pawnPosition[1];
         int[] newPos = {y, x};
 
-        int y_limit = y-1;
-        int x_limit = x-1;
+        int y_limit = y - 1;
+        int x_limit = x - 1;
 
-        if () {
+        boolean isPossibleToWin = false;
+        int[][] winningPosition = getPosGagnante(board);
 
+        // Vérifie qu'on ne puisse pas atteindre une position gagnante avec la position actuelle
+        int i = 0;
+        while (i < winningPosition.length && !isPossibleToWin) {
+            isPossibleToWin = isReachableFromPawn(pawnPosition, winningPosition[i]);
+            i++;
+        }
 
+        // Si c'est le cas se déplacer vers cette position
+        if (isPossibleToWin) {
+            newPos[0] = winningPosition[i - 1][0];
+            newPos[1] = winningPosition[i - 1][1];
         } else {
+
+            // Empêche le bot d'aller dans une direction impossible à jouer
             int direction;
             do {
                 direction = (int) (Math.random() * 3);
-            } while ((direction == 1 && x_limit <= 0) || (direction == 2 && (y_limit <= 0)) || (direction == 3 && (y_limit <= 0 || x_limit <= 0)));
+            } while ((direction == 1 && x_limit < 0) || (direction == 2 && (y_limit < 0)) || (direction == 3 && (y_limit < 0 || x_limit < 0)));
             // TODO: Refact cette expression différemment.
 
-            int nbCase;
+            // Défini un nombre de case de déplacement (dans la limite du possible) qui va être joué
             if (direction != 1) {
                 newPos[0] = (int) (1 + Math.random() * (newPos[0] - 1));
             }
@@ -209,11 +213,19 @@ class Main2 {
                 newPos[1] = (int) (1 + Math.random() * (newPos[0] - 1));
             }
         }
-        switchTwoCase(board, pos, newPos);
+        switchTwoCase(board, pawnPosition, newPos);
     }
 
-    int[][] posGagnante(int[][] board) {
+    boolean isReachableFromPawn(int[] pawnPosition, int[] coord) {
+        // Test s'ils se trouvent sur la même diagonale
+        boolean sameDifference = pawnPosition[0] - coord[0] == pawnPosition[1] - coord[1];
+        boolean isReachable = pawnPosition[0] == coord[0] || pawnPosition[1] == coord[1] || sameDifference;
+        return isReachable;
+    }
+
+    int[][] getPosGagnante(int[][] board) {
         String positionGagnante = "0-0-0";
+        int[] pawnPosition = getPawnPosition(board);
         int i = 0;
         int rank = 0;
         while (i <= board.length) {
@@ -238,7 +250,14 @@ class Main2 {
                 rank++;
                 int x = i;
                 int y = x + rank;
-                positionGagnante += " " + x + "-" + y + " " + y + "-" + x;  // Ajoute (x,y) mais aussi (y,x)
+                System.out.println("x: " + x + " | y: " + y);
+                if (x < pawnPosition[0] && y < pawnPosition[1]) {
+                    positionGagnante += " " + x + "-" + y + " " + y + "-" + x;  // Ajoute (x,y) mais aussi (y,x)
+
+                    // Défini comme position gagnantes
+                    board[y][x] = 2;
+                    board[x][y] = 2;
+                }
             }
             i++;
         }
@@ -311,6 +330,7 @@ class Main2 {
      * @param tab Matrice de jeu
      */
     void displayTab(int[][] tab) {
+        getPosGagnante(tab);
         for (int i = tab.length - 1; i >= 0; i--) {
             // Affiche la ligne de gauche
             if (tab.length > 10 && i < 10) {
@@ -323,6 +343,8 @@ class Main2 {
                 System.out.print("|");
                 if (tab[i][j] == 0) {
                     System.out.print("   ");
+                } else if (tab[i][j] == 2) {
+                    System.out.print(" X ");
                 } else {
                     System.out.print(" O ");
                 }
@@ -360,7 +382,6 @@ class Main2 {
         return tab[0][0] == 1;
     }
 
-
     /**
      * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau…)
      *
@@ -394,7 +415,8 @@ class Main2 {
      * @param nbTour     Nombre de tours
      * @param player     Nom du joueur
      */
-    void displayResult(int playerTurn, String player, int nbTour) {
+    void displayResult(int[][] board, int playerTurn, String player, int nbTour) {
+        displayTab(board);
         System.out.println("##### RESUME DE LA PARTIE #####");
         System.out.print("Le gagnant est : ");
 
