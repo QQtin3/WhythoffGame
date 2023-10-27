@@ -6,13 +6,17 @@
  */
 class Main2 {
     void principal() {
+        // Dé commenter ligne de dessous pour l'exécution des tests.
+        //globalTest();
+
         System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
         System.out.println("""
                 Le pion est placé initialement au hasard sur le plateau. A chaque tour, un joueur a le droit a un
                 seul de ces trois mouvements : déplacement d’un nombre quelconque de cases vers la gauche, le
                 bas, ou le long d’une diagonale vers la gauche et le bas. Le joueur gagnant est celui qui parvient a
-                mettre le pion sur la case inférieure gauche.\n""");
+                mettre le pion sur la case inférieure gauche.
+                """);
 
         // Choisir le pseudonyme du joueur
         String player = SimpleInput.getString("Nom du joueur : ");
@@ -26,7 +30,7 @@ class Main2 {
         // Créer la matrice de jeu
         int[][] board = createBoard(boardSize);
 
-        gamePvB(board, player, botDifficulty);
+        gamePvB(board, player);
     }
 
     /**
@@ -35,7 +39,7 @@ class Main2 {
      * @param board  Matrice de jeu
      * @param player Nom du joueur
      */
-    void gamePvB(int[][] board, String player, int botDifficulty) {
+    void gamePvB(int[][] board, String player) {
         int nbTour = 1;
         boolean winCondition = false;
 
@@ -65,41 +69,9 @@ class Main2 {
             int[] pawn = getPawnPosition(board);
             displayTab(board);
 
-            // Le cas où c'est au joueur humain de jouer
-            if (playerTurn == 0) {
 
-                // Gère les erreurs possibles du joueur lors de ses choix de déplacement.
-                boolean isLegal;
-                int nbCase;
-                int playerDecision;
-                do {
-
-                    // Empêche le joueur de rentrer une valeur autre que 1/2/3
-                    do {
-                        System.out.println("""
-                                Vous disposez de 3 coups :
-                                 1. Déplacement vers la gauche
-                                 2. Déplacement vers le bas
-                                 3. Déplacement en diagonal (gauche-bas)""");
-                        playerDecision = SimpleInput.getInt("Que décidez vous de jouer ? ");
-                    } while (playerDecision < 1 || playerDecision > 3);
-
-
-                    // Empêche le joueur de saisir une valeur négative
-                    do {
-                        nbCase = SimpleInput.getInt("Veuillez saisir un nombre de case de déplacement ");
-                        isLegal = legalMove(pawn, playerDecision, nbCase);
-                    } while (nbCase <= 0);
-
-
-                    if (!isLegal) {
-                        System.out.println("""
-                                ##################################
-                                Veuillez rentrer une valeur valide
-                                ##################################""");
-                    }
-                } while (!isLegal);
-                playerMove(board, nbCase, playerDecision);
+            if (playerTurn == 0) {  // Le cas où c'est au joueur humain de jouer
+                playerToPlay(board, pawn);
             } else {
                 botMove(board);
             }
@@ -121,8 +93,8 @@ class Main2 {
 
 
     /**
-     * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x,y qui associe matrice[y][x] = 1
-     * Le pion ne peut être positionné sur les deux premières lignes et/ou colonnes pour éviter les parties évidentes.
+     * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x, y qui associe matrice[y][x] = 1
+     * Le pion ne peut être positionné sur les deux premières lignes ou colonnes pour éviter les parties évidentes.
      *
      * @param size Taille du tableau
      * @return Matrice de jeu
@@ -139,6 +111,43 @@ class Main2 {
         } while (pawnX == pawnY);
         tab[pawnY][pawnX] = 1;  // Place le pion
         return tab;
+    }
+
+    /***/
+    void playerToPlay(int[][] board, int[] pawn) {
+        boolean isLegal;
+        int nbCase;
+        int playerDecision;
+
+        // Gère les erreurs possibles du joueur lors de ses choix de déplacement.
+        do {
+
+            // Empêche le joueur de rentrer une valeur autre que 1/2/3
+            do {
+                System.out.println("""
+                        Vous disposez de 3 coups :
+                         1. Déplacement vers la gauche
+                         2. Déplacement vers le bas
+                         3. Déplacement en diagonal (gauche-bas)""");
+                playerDecision = SimpleInput.getInt("Que décidez vous de jouer ? ");
+            } while (playerDecision < 1 || playerDecision > 3);
+
+
+            // Empêche le joueur de saisir une valeur négative
+            do {
+                nbCase = SimpleInput.getInt("Veuillez saisir un nombre de case de déplacement ");
+                isLegal = legalMove(pawn, playerDecision, nbCase);
+            } while (nbCase <= 0);
+
+
+            if (!isLegal) {
+                System.out.println("""
+                        ##################################
+                        Veuillez rentrer une valeur valide
+                        ##################################""");
+            }
+        } while (!isLegal);
+        playerMove(board, nbCase, playerDecision);
     }
 
     /**
@@ -174,9 +183,16 @@ class Main2 {
         switchTwoCase(tab, pos, newPos);
     }
 
+    void posGagnante(int[][] board, int[] pawnPosition) {
+
+        /*rank++;
+
+        ord = rank + abs;
+        int[] posGagne = {abs, ord};*/
+    }
 
     /**
-     * Permet de retourner un tableau contenant la position du pion dans un repaire x,y
+     * Permet de retourner un tableau contenant la position du pion dans un repaire x, y
      *
      * @param tab Matrice de jeu
      * @return Tableau avec la position y,x du pion (tab[0] = y et tab[1] = x)
@@ -221,7 +237,12 @@ class Main2 {
     void displayTab(int[][] tab) {
         for (int i = tab.length - 1; i >= 0; i--) {
             // Affiche la ligne de gauche
-            System.out.print(i + " ");
+            if (tab.length > 10 && i < 10) {
+                System.out.print("0" + i + " ");
+            } else {
+                System.out.print(i + " ");
+            }
+
             for (int j = 0; j < tab[0].length; j++) {
                 System.out.print("|");
                 if (tab[i][j] == 0) {
@@ -233,10 +254,22 @@ class Main2 {
             System.out.println("|");
         }
 
-        // Ajoute la ligne tout en bas
-        System.out.print(" ");
+        // Ajoute la ligne tout en bas et lisse l'affichage quand + d'un chiffre
+        if (tab.length > 10) {
+            System.out.print("  ");
+        } else {
+            System.out.print(" ");
+        }
         for (int k = 0; k < tab.length; k++) {
-            System.out.print("   " + k);
+            if (tab.length > 10) {
+                if (k < 10) {
+                    System.out.print("  0" + k);
+                } else {
+                    System.out.print("  " + k);
+                }
+            } else {
+                System.out.print("   " + k);
+            }
         }
         System.out.println();
     }
@@ -253,7 +286,7 @@ class Main2 {
 
 
     /**
-     * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau..)
+     * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau…)
      *
      * @param pawnPosition   Tableau avec les coordonnées du pion
      * @param playerDecision Le coup décidé par le joueur (1/2/3)
@@ -271,7 +304,7 @@ class Main2 {
             tempTab[1] -= nbCase;
         }
 
-        /* Si dans un des deux cas le pion se trouve en position inférieur à 0 alors il est en dehors du tableau et
+        /* Si dans un des deux cas le pion se trouve en position inférieure à 0 alors il est en dehors du tableau et
            c'est donc un coup illégal */
         if (tempTab[0] < 0 || tempTab[1] < 0) {
             isLegal = false;
@@ -301,6 +334,208 @@ class Main2 {
     }
 
 
-    // ######### TEST METHODS PART #########
+    /* ######### TEST METHODS PART #########
+     *  Cette partie permet le test de toutes les autres méthodes utilisées dans le programme.
+     *  Elle utilise deux autres méthodes qui permettent d'afficher correctement
+     *  les matrices et tableaux (displayMatriceTest et displayTabTest)
+     *
+     *  Tous les tests de méthodes sont regroupés dans globalTest() ce qui permet un rendu plus
+     *  efficace dans principal() en cas de doute sur l'efficacité des méthodes (évite les appels 1 à 1)
+     *  #####################################
+     * */
 
+
+    /**
+     * Méthode de test qui affiche toutes les autres méthodes de test afin de s'assurer du bon fonctionnement
+     * de toutes les autres méthodes du programme.
+     */
+    void globalTest() {
+        System.out.println("### Test methods ###");
+
+        //ATTENTION : Sur ces affichages les coordonnées (0,0) sont en haut à gauche contrairement à l'affichage du jeu
+        int[][] matrice = {{0, 1, 0},
+                {0, 0, 0},
+                {0, 0, 0}};
+        int[] pawnPosition = {0, 1};
+        testGameIsDone(matrice, false);
+        testGetPawnPosition(matrice, pawnPosition);
+        testLegalMove(pawnPosition, 1, 1, true);
+        testCreateBoard(4);
+        int[][] newMatrice = {{0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 1}};
+        int[] coord1 = {0, 1};
+        int[] coord2 = {2, 2};
+        testSwitchTwoCase(matrice, coord1, coord2, newMatrice);
+
+        System.out.println("####################\n\n\n");
+    }
+
+    /**
+     * Retourne en String une matrice donnée en entrée.
+     *
+     * @param matrice: matrice (d'entiers)
+     * @return String de l'affichage de la matrice
+     */
+    String displayMatriceTest(int[][] matrice) {
+        String display = " {";
+        for (int i = 0; i < matrice.length; i++) {
+            display += "{";
+            for (int j = 0; j < matrice[i].length; j++) {
+                display += matrice[i][j];
+                if (j != matrice[i].length - 1) {
+                    display += ", ";
+                }
+            }
+            display += "}";
+            if (i != matrice.length - 1) {
+                display += ", ";
+            }
+        }
+        display += "} ";
+        return display;
+    }
+
+    /**
+     * Retourne en String un tableau donné en entrée
+     *
+     * @param tab: tableau d'entiers
+     * @return String de l'affichage du tableau
+     */
+    String displayTabTest(int[] tab) {
+        int i = 0;
+        String display = "{";
+        while (i < tab.length - 1) {
+            display += (tab[i] + ",");
+            i = i + 1;
+        }
+        if (tab.length != 0) {
+            display += (tab[i] + "}");
+        } else {
+            display += "}";
+        }
+        return display;
+    }
+
+    /**
+     * Méthode de test de legalMove() qui renvoie vrai si le coup est jouable par un utilisateur ou non
+     *
+     * @param pawnPosition   Coordonnés du pion sur le plateau
+     * @param playerDecision Le coup décidé par le joueur (1/2/3)
+     * @param nbCase         Le nombre de cases de déplacement du joueur
+     * @param result         Contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
+    void testLegalMove(int[] pawnPosition, int playerDecision, int nbCase, boolean result) {
+        System.out.println("legalMove(" + displayTabTest(pawnPosition) + ", " + playerDecision + ", " + nbCase + ") : ");
+        boolean testResult = legalMove(pawnPosition, playerDecision, nbCase);
+        if (result == testResult) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
+
+    /**
+     * Méthode de test de gameIsDone() qui test si la partie est finie ou non.
+     *
+     * @param matrice Matrice de jeu avec notre pion
+     * @param result  Booléen qui contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
+    void testGameIsDone(int[][] matrice, boolean result) {
+        System.out.println("gameIsDone(" + displayMatriceTest(matrice) + ") : ");
+        boolean testResult = gameIsDone(matrice);
+        if (result == testResult) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
+
+    /**
+     * Méthode de test de getPawnPosition() qui renvoie les coordonnées du pion sur le plateau
+     *
+     * @param matrice Matrice de jeu avec notre pion
+     * @param result  Tableau qui contient le résultat attendu de la fonction getPawnPosition pour le tableau donné
+     */
+    void testGetPawnPosition(int[][] matrice, int[] result) {
+        System.out.println("getPawnPosition(" + displayMatriceTest(matrice) + ") : ");
+        int[] testResult = getPawnPosition(matrice);
+        // Vérifie que les deux tableaux à deux nombres aient bien les mêmes valeurs
+        if (result[0] == testResult[0] && result[1] == testResult[1]) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
+
+    /**
+     * Méthode de test de createBoard() qui créé une matrice de taille size, et place un pion "aléatoirement" dedans
+     *
+     * @param size Taille du plateau qui doit être créé
+     */
+    void testCreateBoard(int size) {
+        System.out.println("createBoard(" + size + ") : ");
+        int[][] testResult = createBoard(size);
+
+        // Vérifie le nombre de pions sur le plateau + si notre plateau est carré
+        boolean isSquare = true;
+        int numberOfPawn = 0;
+        for (int i = 0; i < testResult.length; i++) {
+            for (int j = 0; j < testResult[i].length; j++) {
+                if (testResult[i][j] == 1) {  // Détecte si on trouve notre pion
+                    numberOfPawn++;
+                }
+                if (testResult.length != testResult[i].length) {
+                    isSquare = false;
+                }
+            }
+        }
+
+        // Vérifie que le tableau soit bien carré, de longueur size,
+        if ((size == testResult.length) && (isSquare) && (numberOfPawn == 1)) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
+
+    /**
+     * Méthode de test de switchTwoCase() qui échange deux cases d'une matrice
+     *
+     * @param coord1  Coordonnés de la première case à intervertir
+     * @param coord2  Coordonnés de la deuxième case à intervertir
+     * @param matrice Matrice à l'origine utilisée avant l'utilisation de la fonction
+     * @param result  Matrice qui contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
+    void testSwitchTwoCase(int[][] matrice, int[] coord1, int[] coord2, int[][] result) {
+        /* TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
+         *  Problème réglé par la méthode clone() peut être effectué à la main cependant.*/
+
+        // Méthode non vue : copie le contenu d'un tableau/d'une matrice
+        int[][] matriceCopy = matrice.clone();
+
+        System.out.println("switchTwoCase(" + displayMatriceTest(matriceCopy) + ", "
+                + displayTabTest(coord1) + ", "
+                + displayTabTest(coord2) + ", "
+                + displayMatriceTest(result) + ") : ");
+
+        switchTwoCase(matriceCopy, coord1, coord2);
+
+        /* Ici on va regarder l'ensemble des cases de notre matrice modifiée et de notre résultat attendu afin d'être
+         * absolument sûr que notre fonction de départ n'ait pas d'effet inattendu sur d'autres cases du tableau */
+        boolean isEqual = true;
+        for (int i = 0; i < matriceCopy.length; i++) {
+            for (int j = 0; j < matriceCopy[i].length; j++) {
+                if (matriceCopy[i][j] != result[i][j]) { // Si on remarque une différence entre deux cases
+                    isEqual = false;
+                }
+            }
+        }
+
+        if (isEqual) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
 }

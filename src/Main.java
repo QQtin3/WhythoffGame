@@ -15,7 +15,8 @@ class Main {
                 Le pion est placé initialement au hasard sur le plateau. A chaque tour, un joueur a le droit a un
                 seul de ces trois mouvements : déplacement d’un nombre quelconque de cases vers la gauche, le
                 bas, ou le long d’une diagonale vers la gauche et le bas. Le joueur gagnant est celui qui parvient a
-                mettre le pion sur la case inférieure gauche.\n""");
+                mettre le pion sur la case inférieure gauche.
+                """);
 
         String player1 = SimpleInput.getString("Nom du joueur1 : ");
         String player2 = SimpleInput.getString("Nom du joueur2 : ");
@@ -36,7 +37,7 @@ class Main {
     /**
      * Déroule une partie en Joueur contre Joueur (ou Player versus Player (PvP)) du jeu
      *
-     * @param board   Matricce de jeu
+     * @param board   Matrices de jeu
      * @param player1 Nom du joueur1
      * @param player2 Nom du joueur2
      */
@@ -111,8 +112,8 @@ class Main {
     }
 
     /**
-     * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x,y qui associe matrice[y][x] = 1
-     * Le pion ne peut être positionné sur les deux premières lignes et/ou colonnes pour éviter les parties évidentes.
+     * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x, y qui associe matrice[y][x] = 1
+     * Le pion ne peut être positionné sur les deux premières lignes ou colonnes pour éviter les parties évidentes.
      *
      * @param size Taille du tableau
      * @return Matrice de jeu
@@ -151,7 +152,7 @@ class Main {
     }
 
     /**
-     * Permet de retourner un tableau contenant la position du pion dans un repaire x,y
+     * Permet de retourner un tableau contenant la position du pion dans un repaire x, y
      *
      * @param tab Matrice de jeu
      * @return Tableau avec la position y,x du pion (tab[0] = y et tab[1] = x)
@@ -213,7 +214,7 @@ class Main {
             System.out.println("|");
         }
 
-        // Ajoute la ligne tout en bas et lisse l'affichage quand + d'un chiffe
+        // Ajoute la ligne tout en bas et lisse l'affichage quand + d'un chiffre
         if (tab.length > 10) {
             System.out.print("  ");
         } else {
@@ -221,13 +222,12 @@ class Main {
         }
         for (int k = 0; k < tab.length; k++) {
             if (tab.length > 10) {
-                if (k < 10){
+                if (k < 10) {
                     System.out.print("  0" + k);
                 } else {
                     System.out.print("  " + k);
                 }
-            }
-            else {
+            } else {
                 System.out.print("   " + k);
             }
         }
@@ -245,7 +245,7 @@ class Main {
     }
 
     /**
-     * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau..)
+     * Méthode vérifiant la possibilité du coup entré par l'utilisateur (ne sort pas du tableau...)
      *
      * @param pawnPosition   Tableau avec les coordonnées du pion
      * @param playerDecision Le coup décidé par le joueur (1/2/3)
@@ -263,7 +263,7 @@ class Main {
             tempTab[1] -= nbCase;
         }
 
-        /* Si dans un des deux cas le pion se trouve en position inférieur à 0 alors il est en dehors du tableau et
+        /* Si dans un des deux cas le pion se trouve en position inférieure à 0 alors il est en dehors du tableau et
            c'est donc un coup illégal */
         if (tempTab[0] < 0 || tempTab[1] < 0) {
             isLegal = false;
@@ -437,7 +437,7 @@ class Main {
         System.out.println("createBoard(" + size + ") : ");
         int[][] testResult = createBoard(size);
 
-        // Vérifie le nombre de pion sur le plateau + si notre plateau est carré
+        // Vérifie le nombre de pions sur le plateau + si notre plateau est carré
         boolean isSquare = true;
         int numberOfPawn = 0;
         for (int i = 0; i < testResult.length; i++) {
