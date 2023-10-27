@@ -277,18 +277,44 @@ class Main {
     }
 
 
-    // ######### TEST METHODS PART #########
+    /* ######### TEST METHODS PART #########
+    *  Cette partie permet le test de toutes les autres méthodes utilisées dans le programme.
+    *  Elle utilise deux autres méthodes qui permettent d'afficher correctement
+    *  les matrices et tableaux (displayMatriceTest et displayTabTest)
+    *
+    *  Tous les tests de méthodes sont regroupés dans globalTest() ce qui permet un rendu plus
+    *  efficace dans principal() en cas de doute sur l'efficacité des méthodes (évite les appels 1 à 1)
+    *  #####################################
+    * */
 
     void globalTest() {
         System.out.println("### Test methods ###");
 
-        int[][] matrice = {{0, 1, 0}, {0, 0, 0}, {0, 0, 0}};
+        //ATTENTION : Sur ces affichages les coordonnées (0,0) sont en haut à gauche contrairement à l'affichage du jeu
+        int[][] matrice = {{0, 1, 0},
+                {0, 0, 0},
+                {0, 0, 0}};
+        int[] pawnPosition = {0, 1};
         testGameIsDone(matrice, false);
-
+        testGetPawnPositition(matrice, pawnPosition);
+        testLegalMove(pawnPosition, 1, 1, true);
+        testCreateBoard(4);
+        int[][] newMatrice = {{0, 0, 0},
+                {0, 0, 0},
+                {0, 0, 1}};
+        int[] coord1 = {0,1};
+        int[] coord2 = {2,2};
+        testSwitchTwoCase(matrice, coord1, coord2, newMatrice);
 
         System.out.println("\n\n");
     }
 
+    /**
+     * Retourne en String une matrice donnée en entrée.
+     *
+     * @param matrice: matrice (d'entiers)
+     * @return String de l'affichage de la matrice
+     */
     String displayMatriceTest(int[][] matrice) {
         String display = " {";
         for (int i = 0; i < matrice.length; i++) {
@@ -329,43 +355,89 @@ class Main {
         return display;
     }
 
+
     void testLegalMove(int[] pawnPosition, int playerDecision, int nbCase, boolean result) {
         System.out.println("legalMove(" + displayTabTest(pawnPosition) + ", " + playerDecision + ", " + nbCase + ") : ");
         boolean testResult = legalMove(pawnPosition, playerDecision, nbCase);
         if (result == testResult) {
-            System.out.print("OK");
+            System.out.println("OK");
         } else {
-            System.out.print("ERREUR");
+            System.out.println("ERREUR");
         }
     }
 
     void testGameIsDone(int[][] tab, boolean result) {
-        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
+        System.out.println("gameIsDone(" + displayMatriceTest(tab) + ") : ");
         boolean testResult = gameIsDone(tab);
         if (result == testResult) {
-            System.out.print("OK");
+            System.out.println("OK");
         } else {
-            System.out.print("ERREUR");
+            System.out.println("ERREUR");
         }
     }
 
-    void testGetPawnPositition(int[][] tab, boolean result) {
-        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
-        boolean testResult = gameIsDone(tab);
-        if (result == testResult) {
-            System.out.print("OK");
+    void testGetPawnPositition(int[][] tab, int[] result) {
+        System.out.println("getPawnPosition(" + displayMatriceTest(tab) + ") : ");
+        int[] testResult = getPawnPosition(tab);
+        // Vérifie que les deux tableaux à deux nombres aient bien les mêmes valeurs
+        if (result[0] == testResult[0] && result[1] == testResult[1]) {
+            System.out.println("OK");
         } else {
-            System.out.print("ERREUR");
+            System.out.println("ERREUR");
         }
     }
 
-    void testCreateBoard(int[][] tab, boolean result) {
-        System.out.println("gameIsDone(" + displayTabTest(tab) + ") : ");
-        boolean testResult = gameIsDone(tab);
-        if (result == testResult) {
-            System.out.print("OK");
+    void testCreateBoard(int size) {
+        System.out.println("createBoard(" + size + ") : ");
+        int[][] testResult = createBoard(size);
+
+        // Vérifie le nombre de pion sur le plateau + si notre plateau est carré
+        boolean isSquare = true;
+        int numberOfPawn = 0;
+        for (int i = 0; i < testResult.length; i++) {
+            for (int j = 0; j < testResult[i].length; j++) {
+                if (testResult[i][j] == 1) {  // Détecte si on trouve notre pion
+                    numberOfPawn++;
+                }
+                if (testResult.length != testResult[i].length) {
+                    isSquare = false;
+                }
+            }
+        }
+
+        // Vérifie que le tableau soit bien carré, de longueur size,
+        if ((size == testResult.length) && (isSquare) && (numberOfPawn == 1)) {
+            System.out.println("OK");
         } else {
-            System.out.print("ERREUR");
+            System.out.println("ERREUR");
+        }
+    }
+
+    void testSwitchTwoCase(int[][] matrice, int[] coord1, int[] coord2, int[][] result) {
+        // TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
+
+        System.out.println("switchTwoCase(" + displayMatriceTest(matrice) + ", "
+                + displayTabTest(coord1) + ", "
+                + displayTabTest(coord2) + ", "
+                + displayMatriceTest(result) + ") : ");
+
+        switchTwoCase(matrice, coord1, coord2);
+
+        /* Ici on va regarder l'ensemble des cases de notre matrice modifiée et de notre résultat attendu afin d'être
+         * absolument sûr que notre fonction de départ n'ait pas d'effet inattendu sur d'autres cases du tableau */
+        boolean isEqual = true;
+        for (int i = 0; i < matrice.length; i++) {
+            for (int j = 0; j < matrice[i].length; j++) {
+                if (matrice[i][j] != result[i][j]) { // Si on remarque une différence entre deux cases
+                    isEqual = false;
+                }
+            }
+        }
+
+        if (isEqual) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
         }
     }
 }
