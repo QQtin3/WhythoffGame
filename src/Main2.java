@@ -9,7 +9,16 @@ class Main2 {
         // Dé commenter ligne de dessous pour l'exécution des tests.
         //globalTest();
 
-        System.out.println("Bienvenue dans le jeu !");
+        int[][] test = stringToMatrice("1-2-3 5-7-9 2-4-6");
+        String teststr = displayMatriceTest(test);
+        //System.out.print(teststr);
+
+        int[][] board = createBoard(12);
+        int[][] posGagnantes = posGagnante(board);
+        String tab = displayMatriceTest(posGagnantes);
+        System.out.println(tab);
+
+        /*System.out.println("Bienvenue dans le jeu !");
         System.out.println("Règles : ");
         System.out.println("""
                 Le pion est placé initialement au hasard sur le plateau. A chaque tour, un joueur a le droit a un
@@ -30,7 +39,7 @@ class Main2 {
         // Créer la matrice de jeu
         int[][] board = createBoard(boardSize);
 
-        gamePvB(board, player);
+        gamePvB(board, player);*/
     }
 
     /**
@@ -173,22 +182,89 @@ class Main2 {
         switchTwoCase(tab, pos, newPos);
     }
 
-    void botMove(int[][] tab) {
-        int[] pos = getPawnPosition(tab);
+    void botMove(int[][] board) {
+        int[] pos = getPawnPosition(board);
         int y = pos[0];
         int x = pos[1];
         int[] newPos = {y, x};
 
+        int y_limit = y-1;
+        int x_limit = x-1;
 
-        switchTwoCase(tab, pos, newPos);
+        if () {
+
+
+        } else {
+            int direction;
+            do {
+                direction = (int) (Math.random() * 3);
+            } while ((direction == 1 && x_limit <= 0) || (direction == 2 && (y_limit <= 0)) || (direction == 3 && (y_limit <= 0 || x_limit <= 0)));
+            // TODO: Refact cette expression différemment.
+
+            int nbCase;
+            if (direction != 1) {
+                newPos[0] = (int) (1 + Math.random() * (newPos[0] - 1));
+            }
+            if (direction != 2) {
+                newPos[1] = (int) (1 + Math.random() * (newPos[0] - 1));
+            }
+        }
+        switchTwoCase(board, pos, newPos);
     }
 
-    void posGagnante(int[][] board, int[] pawnPosition) {
+    int[][] posGagnante(int[][] board) {
+        String positionGagnante = "0-0-0";
+        int i = 0;
+        int rank = 0;
+        while (i <= board.length) {
+            int[][] matricePosGagnante = stringToMatrice(positionGagnante);
 
-        /*rank++;
+            // Sert à regarder si i est déjà en tant qu'abscisse ou ordonné
+            boolean isNotInMatrice = true;
+            int j = 0;
+            while (j < matricePosGagnante.length && isNotInMatrice) {
+                int k = 1;
+                while (k <= 1 && isNotInMatrice) {
+                    if (matricePosGagnante[j][k] == i) {
+                        isNotInMatrice = false;
+                    }
+                    k++;
+                }
+                j++;
+            }
 
-        ord = rank + abs;
-        int[] posGagne = {abs, ord};*/
+            // Si i n'a pas été utilisé précédemment alors c'est une nouvelle position gagnante
+            if (isNotInMatrice) {
+                rank++;
+                int x = i;
+                int y = x + rank;
+                positionGagnante += " " + x + "-" + y + " " + y + "-" + x;  // Ajoute (x,y) mais aussi (y,x)
+            }
+            i++;
+        }
+        int[][] result = stringToMatrice(positionGagnante);
+        return result;
+    }
+
+    /**
+     * Transforme une chaîne de caractère en une matrice lorsque possible, mettre un espace pour un nouvel élément du
+     * tableau principal, mettre un - pour séparer plusieurs éléments dans un même tableau (max. 3 éléments)
+     * "1-2-3 5-7-9 2-4-6" devient {{1, 2, 3}, {5, 7, 9}, {2, 4, 6}}
+     *
+     * @param sequence Chaîne de caractères
+     * @return Matrice créée grâce à la chaîne de caractères
+     */
+    int[][] stringToMatrice(String sequence) {
+        String[] pos = sequence.split(" ");
+        int[][] matrice = new int[pos.length][2];
+
+        for (int i = 0; i < pos.length; i++) {
+            String[] coords = pos[i].split("-");
+            for (int j = 0; j < matrice[i].length; j++) {
+                matrice[i][j] = Integer.parseInt(coords[j]);
+            }
+        }
+        return matrice;
     }
 
     /**
