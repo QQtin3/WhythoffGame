@@ -56,6 +56,12 @@ class Main2 {
             playerTurn = 1;
         }
 
+        // Permet de définir les positions gagnantes sur le plateau
+        int[][] posGagnante = getPosGagnante(board);
+        for (int i = 0; i < posGagnante.length; i++) {
+            setPosGagnante(board, posGagnante[i]);
+        }
+
         // Déroulement du jeu
         while (!winCondition) {
             System.out.print("Tour n° " + nbTour + " - ");
@@ -64,18 +70,13 @@ class Main2 {
             } else {
                 System.out.println("c'est à l'ordinateur de jouer");
             }
-
-            // Affiche la position du pion sur le plateau et le plateau
-            int[] pawn = getPawnPosition(board);
             displayTab(board);
 
-
             if (playerTurn == 0) {  // Le cas où c'est au joueur humain de jouer
-                playerToPlay(board, pawn);
+                playerToPlay(board);
             } else {
                 botMove(board);
             }
-
 
             // Détermine si la partie est finie
             winCondition = gameIsDone(board);
@@ -113,8 +114,13 @@ class Main2 {
         return tab;
     }
 
-    /***/
-    void playerToPlay(int[][] board, int[] pawn) {
+    /**
+     * Permet l'interaction et le mouvement avec l'utilisateur lors de son coup, textuel et déplacement du pion
+     * sur le plateau selon les entrées saisies.
+     * @param board Matrice de jeu
+     * */
+    void playerToPlay(int[][] board) {
+        int[] pawnPosition = getPawnPosition(board);
         boolean isLegal;
         int nbCase;
         int playerDecision;
@@ -136,7 +142,7 @@ class Main2 {
             // Empêche le joueur de saisir une valeur négative
             do {
                 nbCase = SimpleInput.getInt("Veuillez saisir un nombre de case de déplacement ");
-                isLegal = legalMove(pawn, playerDecision, nbCase);
+                isLegal = legalMove(pawnPosition, playerDecision, nbCase);
             } while (nbCase <= 0);
 
 
@@ -173,6 +179,11 @@ class Main2 {
         switchTwoCase(tab, pos, newPos);
     }
 
+    /**
+     * Permet au bot (ordinateur) de jouer un coup lorsque c'est à son tour de jouer.
+     * Joue légèrement intelligemment (aléatoire sauf s'il est possible d'atteindre une position gagnante en 1 coup)
+     * @param board Matrice de jeu
+     * */
     void botMove(int[][] board) {
         int[] pawnPosition = getPawnPosition(board);
         int y = pawnPosition[0];
@@ -192,8 +203,15 @@ class Main2 {
             i++;
         }
 
-        // Si c'est le cas se déplacer vers cette position
+        boolean isSamePosition;
         if (isPossibleToWin) {
+            isSamePosition = (pawnPosition[0] == winningPosition[i - 1][0]) && (pawnPosition[1] == winningPosition[i - 1][1]);
+        } else {
+            isSamePosition = true;
+        }
+
+        // Si la position est gagnante et n'est pas la position déjà occupée par le pion
+        if (!isSamePosition) {
             newPos[0] = winningPosition[i - 1][0];
             newPos[1] = winningPosition[i - 1][1];
         } else {
@@ -205,27 +223,39 @@ class Main2 {
             } while ((direction == 1 && x_limit < 0) || (direction == 2 && (y_limit < 0)) || (direction == 3 && (y_limit < 0 || x_limit < 0)));
             // TODO: Refact cette expression différemment.
 
-            // Défini un nombre de case de déplacement (dans la limite du possible) qui va être joué
+            // Défini un nombre de cases de déplacement (dans la limite du possible) qui va être joué
             if (direction != 1) {
-                newPos[0] = (int) (1 + Math.random() * (newPos[0] - 1));
+                newPos[0] -= (int) (1 + Math.random() * (newPos[0] - 1));
             }
             if (direction != 2) {
-                newPos[1] = (int) (1 + Math.random() * (newPos[0] - 1));
+                newPos[1] -= (int) (1 + Math.random() * (newPos[1] - 1));
             }
         }
         switchTwoCase(board, pawnPosition, newPos);
     }
 
+    /**
+     * Détermine s'il est possible de passer des coordonnées du pion à celles de la deuxième position en 1 coup
+     * @param pawnPosition Position du pion sur le plateau sous forme de tableau à 2 valeurs (y, x)
+     * @param coord Position sur le plateau sous forme d'un tableau à deux valeurs (y, x)
+     * @return Vrai si possible de passer des coordonnées du pion à celles de la deuxième position en 1 coup sinon faux
+     * */
     boolean isReachableFromPawn(int[] pawnPosition, int[] coord) {
         // Test s'ils se trouvent sur la même diagonale
         boolean sameDifference = pawnPosition[0] - coord[0] == pawnPosition[1] - coord[1];
+
+        // Si on a le même x ou y pour les 2 positions alors la position est atteignable (+ diagonale avec sameDifference)
         boolean isReachable = pawnPosition[0] == coord[0] || pawnPosition[1] == coord[1] || sameDifference;
         return isReachable;
     }
 
+    /**
+     * Permet d'obtenir l'intégralité des positions gagnantes sur le plateau de jeu
+     * @param board Matrice de jeu
+     * @return Matrice contenant les coordonnées des positions gagnantes sur le plateau
+     * */
     int[][] getPosGagnante(int[][] board) {
-        String positionGagnante = "0-0-0";
-        int[] pawnPosition = getPawnPosition(board);
+        String positionGagnante = "0-0";
         int i = 0;
         int rank = 0;
         while (i <= board.length) {
@@ -250,19 +280,24 @@ class Main2 {
                 rank++;
                 int x = i;
                 int y = x + rank;
-                System.out.println("x: " + x + " | y: " + y);
-                if (x < pawnPosition[0] && y < pawnPosition[1]) {
+                if (x < board.length && y < board.length) {
                     positionGagnante += " " + x + "-" + y + " " + y + "-" + x;  // Ajoute (x,y) mais aussi (y,x)
-
-                    // Défini comme position gagnantes
-                    board[y][x] = 2;
-                    board[x][y] = 2;
                 }
             }
             i++;
         }
         int[][] result = stringToMatrice(positionGagnante);
         return result;
+    }
+
+    /**
+     * Change les valeurs de la matrice aux coordonnées données (x, y) à 2, mais également (y, x) à 2
+     * @param board Matrice de jeu
+     * @param coord Tableau contenant 2 valeurs, les coordonnées à mettre comme valeur 2
+     * */
+    void setPosGagnante(int[][] board, int[] coord) {
+        board[coord[0]][coord[1]] = 2;
+        board[coord[1]][coord[0]] = 2;
     }
 
     /**
@@ -312,7 +347,8 @@ class Main2 {
     }
 
     /**
-     * Permet d'échanger deux cases d'une matrice
+     * Permet d'échanger deux cases d'une matrice et empêcher d'afficher une position gagnante à un autre endroit
+     * à cause du déplacement de case
      *
      * @param tab    Matrice où l'échange a lieu
      * @param coord1 Tableau contenant les coordonnées de la première case
@@ -320,6 +356,14 @@ class Main2 {
      */
     void switchTwoCase(int[][] tab, int[] coord1, int[] coord2) {
         int tmp = tab[coord1[0]][coord1[1]];
+
+        // Empêche d'afficher une position gagnante à un autre endroit à cause du déplacement de case
+        if (tmp == 2) {
+            tmp = 0;
+        } else if (tab[coord2[0]][coord2[1]] == 2) {
+            tab[coord2[0]][coord2[1]] = 0;
+        }
+
         tab[coord1[0]][coord1[1]] = tab[coord2[0]][coord2[1]];
         tab[coord2[0]][coord2[1]] = tmp;
     }
@@ -330,7 +374,6 @@ class Main2 {
      * @param tab Matrice de jeu
      */
     void displayTab(int[][] tab) {
-        getPosGagnante(tab);
         for (int i = tab.length - 1; i >= 0; i--) {
             // Affiche la ligne de gauche
             if (tab.length > 10 && i < 10) {
