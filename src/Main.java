@@ -385,7 +385,7 @@ class Main {
      * @param result         Contient le résultat attendu à l'issue de la fonction qui doit être testée
      */
     void testLegalMove(int[] pawnPosition, int playerDecision, int nbCase, boolean result) {
-        System.out.println("legalMove(" + displayTabTest(pawnPosition) + ", " + playerDecision + ", " + nbCase + ") : ");
+        System.out.println("legalMove(" + displayTabTest(pawnPosition)+ ", " + playerDecision + ", " + nbCase + ") : ");
         boolean testResult = legalMove(pawnPosition, playerDecision, nbCase);
         if (result == testResult) {
             System.out.println("OK");
@@ -409,7 +409,6 @@ class Main {
             System.out.println("ERREUR");
         }
     }
-
 
     /**
      * Méthode de test de getPawnPosition() qui renvoie les coordonnées du pion sur le plateau
@@ -468,9 +467,6 @@ class Main {
      * @param result  Matrice qui contient le résultat attendu à l'issue de la fonction qui doit être testée
      */
     void testSwitchTwoCase(int[][] matrice, int[] coord1, int[] coord2, int[][] result) {
-        /* TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
-         *  Problème réglé par la méthode clone() peut être effectué à la main cependant.*/
-
         // Méthode non vue : copie le contenu d'un tableau/d'une matrice
         int[][] matriceCopy = matrice.clone();
 

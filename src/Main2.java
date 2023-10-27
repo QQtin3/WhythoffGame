@@ -6,7 +6,7 @@
  */
 class Main2 {
     void principal() {
-        // Dé commenter ligne de dessous pour l'exécution des tests.
+        //Dé commenter ligne de dessous pour l'exécution des tests.
         //globalTest();
 
         System.out.println("Bienvenue dans le jeu !");
@@ -70,7 +70,7 @@ class Main2 {
             } else {
                 System.out.println("c'est à l'ordinateur de jouer");
             }
-            displayTab(board);
+            displayMatrice(board);
 
             if (playerTurn == 0) {  // Le cas où c'est au joueur humain de jouer
                 playerToPlay(board);
@@ -91,7 +91,6 @@ class Main2 {
         }
         displayResult(board, playerTurn, player, nbTour);
     }
-
 
     /**
      * Créer une matrice vide de taille n avec un pion positionné "aléatoirement" en x, y qui associe matrice[y][x] = 1
@@ -117,8 +116,9 @@ class Main2 {
     /**
      * Permet l'interaction et le mouvement avec l'utilisateur lors de son coup, textuel et déplacement du pion
      * sur le plateau selon les entrées saisies.
+     *
      * @param board Matrice de jeu
-     * */
+     */
     void playerToPlay(int[][] board) {
         int[] pawnPosition = getPawnPosition(board);
         boolean isLegal;
@@ -182,8 +182,9 @@ class Main2 {
     /**
      * Permet au bot (ordinateur) de jouer un coup lorsque c'est à son tour de jouer.
      * Joue légèrement intelligemment (aléatoire sauf s'il est possible d'atteindre une position gagnante en 1 coup)
+     *
      * @param board Matrice de jeu
-     * */
+     */
     void botMove(int[][] board) {
         int[] pawnPosition = getPawnPosition(board);
         int y = pawnPosition[0];
@@ -236,10 +237,11 @@ class Main2 {
 
     /**
      * Détermine s'il est possible de passer des coordonnées du pion à celles de la deuxième position en 1 coup
+     *
      * @param pawnPosition Position du pion sur le plateau sous forme de tableau à 2 valeurs (y, x)
-     * @param coord Position sur le plateau sous forme d'un tableau à deux valeurs (y, x)
+     * @param coord        Position sur le plateau sous forme d'un tableau à deux valeurs (y, x)
      * @return Vrai si possible de passer des coordonnées du pion à celles de la deuxième position en 1 coup sinon faux
-     * */
+     */
     boolean isReachableFromPawn(int[] pawnPosition, int[] coord) {
         // Test s'ils se trouvent sur la même diagonale
         boolean sameDifference = pawnPosition[0] - coord[0] == pawnPosition[1] - coord[1];
@@ -251,9 +253,10 @@ class Main2 {
 
     /**
      * Permet d'obtenir l'intégralité des positions gagnantes sur le plateau de jeu
+     *
      * @param board Matrice de jeu
      * @return Matrice contenant les coordonnées des positions gagnantes sur le plateau
-     * */
+     */
     int[][] getPosGagnante(int[][] board) {
         String positionGagnante = "0-0";
         int i = 0;
@@ -292,9 +295,10 @@ class Main2 {
 
     /**
      * Change les valeurs de la matrice aux coordonnées données (x, y) à 2, mais également (y, x) à 2
+     *
      * @param board Matrice de jeu
      * @param coord Tableau contenant 2 valeurs, les coordonnées à mettre comme valeur 2
-     * */
+     */
     void setPosGagnante(int[][] board, int[] coord) {
         board[coord[0]][coord[1]] = 2;
         board[coord[1]][coord[0]] = 2;
@@ -373,7 +377,7 @@ class Main2 {
      *
      * @param tab Matrice de jeu
      */
-    void displayTab(int[][] tab) {
+    void displayMatrice(int[][] tab) {
         for (int i = tab.length - 1; i >= 0; i--) {
             // Affiche la ligne de gauche
             if (tab.length > 10 && i < 10) {
@@ -459,7 +463,7 @@ class Main2 {
      * @param player     Nom du joueur
      */
     void displayResult(int[][] board, int playerTurn, String player, int nbTour) {
-        displayTab(board);
+        displayMatrice(board);
         System.out.println("##### RESUME DE LA PARTIE #####");
         System.out.print("Le gagnant est : ");
 
@@ -495,19 +499,36 @@ class Main2 {
 
         //ATTENTION : Sur ces affichages les coordonnées (0,0) sont en haut à gauche contrairement à l'affichage du jeu
         int[][] matrice = {{0, 1, 0},
-                {0, 0, 0},
-                {0, 0, 0}};
+                {0, 2, 0},
+                {0, 0, 2}};
+        int[][] matrice2 = {{0, 1, 0},
+                {0, 2, 0},
+                {0, 0, 2}};
         int[] pawnPosition = {0, 1};
         testGameIsDone(matrice, false);
         testGetPawnPosition(matrice, pawnPosition);
         testLegalMove(pawnPosition, 1, 1, true);
+        testLegalMove(pawnPosition, 2, 1, false);
         testCreateBoard(4);
+
+
         int[][] newMatrice = {{0, 0, 0},
-                {0, 0, 0},
+                {0, 2, 0},
                 {0, 0, 1}};
+        int[][] newMatrice2 = {{0, 0, 0},
+                {0, 1, 0},
+                {0, 0, 2}};
         int[] coord1 = {0, 1};
         int[] coord2 = {2, 2};
+        int[] coord3 = {1, 1};
         testSwitchTwoCase(matrice, coord1, coord2, newMatrice);
+        testSwitchTwoCase(matrice2, coord1, coord3, newMatrice2);
+
+        int[] coord4 = {0, 1};
+        int[] coord5 = {0, 3};
+        int[] coord6 = {2, 2};
+        testIsReachableFromPawn(coord4, coord5, true);
+        testIsReachableFromPawn(coord4, coord6, false);
 
         System.out.println("####################\n\n\n");
     }
@@ -649,9 +670,6 @@ class Main2 {
      * @param result  Matrice qui contient le résultat attendu à l'issue de la fonction qui doit être testée
      */
     void testSwitchTwoCase(int[][] matrice, int[] coord1, int[] coord2, int[][] result) {
-        /* TODO: Utiliser la copie d'un tableau pour éviter un effet de bord qui changerait notre matrice.
-         *  Problème réglé par la méthode clone() peut être effectué à la main cependant.*/
-
         // Méthode non vue : copie le contenu d'un tableau/d'une matrice
         int[][] matriceCopy = matrice.clone();
 
@@ -674,6 +692,25 @@ class Main2 {
         }
 
         if (isEqual) {
+            System.out.println("OK");
+        } else {
+            System.out.println("ERREUR");
+        }
+    }
+
+    /**
+     * Méthode de test de isReachableFromPawn()
+     *
+     * @param pawnPosition Coordonnés du pion sur le plateau
+     * @param coord        coordonnées à tester
+     * @param result       Matrice qui contient le résultat attendu à l'issue de la fonction qui doit être testée
+     */
+    void testIsReachableFromPawn(int[] pawnPosition, int[] coord, boolean result) {
+        System.out.println("isReachableFromPawn(" + displayTabTest(pawnPosition) + ", "
+                + displayTabTest(coord) + ", " + result);
+
+        boolean testResult = isReachableFromPawn(pawnPosition, coord);
+        if (testResult == result) {
             System.out.println("OK");
         } else {
             System.out.println("ERREUR");
